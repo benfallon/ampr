@@ -12,10 +12,4 @@
     tools:context="com.benjaminafallon.androidapps.ampr.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <com.digits.sdk.android.DigitsAuthButton
-        android:id="@+id/auth_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-
 </RelativeLayout>
