@@ -42,5 +42,7 @@ dependencies {
     compile('com.digits.sdk.android:digits:1.9.3@aar') {
         transitive = true;
     }
+    compile 'com.parse.bolts:bolts-android:1.+'
+    compile 'com.parse:parse-android:1.+'
 
 }
