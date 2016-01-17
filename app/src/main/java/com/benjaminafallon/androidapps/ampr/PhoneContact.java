@@ -3,6 +3,9 @@ package com.benjaminafallon.androidapps.ampr;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
 /**
  * Created by BenFallon on 9/24/14.
  */
@@ -36,6 +39,14 @@ public class PhoneContact implements Parcelable {
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
+
+    //returns ParseUser if found; else, return null
+//    public ParseUser getParseContact() {
+//
+//        ParseQuery<ParseUser> query = ParseUser.getQuery();
+//
+//
+//    }
 
     @Override
     public int describeContents() {
