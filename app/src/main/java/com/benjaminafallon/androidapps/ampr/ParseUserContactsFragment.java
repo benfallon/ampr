@@ -40,7 +40,7 @@ public class ParseUserContactsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        rootView = inflater.inflate(R.layout.content_main, container, false);
+        rootView = inflater.inflate(R.layout.content_main2, container, false);
 
         new LoadParseUserContactsTask().execute();
 
@@ -70,7 +70,7 @@ public class ParseUserContactsFragment extends Fragment {
 //                dialog.dismiss();
 //            }
 
-            ListView parseUserContactsListView = (ListView) rootView.findViewById( R.id.parse_user_contacts_listview );
+            ListView parseUserContactsListView = (ListView) rootView.findViewById( R.id.parse_user_contacts_listview2 );
 
             //the following includes built-in layout XML files
             adapter = new ParseUserContactsAdapter(getActivity(), parseUserContactsList);

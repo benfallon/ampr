@@ -42,7 +42,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public final int PICK_CONTACT = 2015;
+    //public final int PICK_CONTACT = 2015;
+    public final int PICK_PARSE_CONTACT = 2015;
+
     private ArrayList<PhoneContact> activeContacts = new ArrayList<PhoneContact>();
 
     @Override
@@ -82,10 +84,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-                Fragment parseUserContactsFrag = new ParseUserContactsFragment();
-                Fragment aboutFrag = new AboutFragment();
-                android.support.v4.app.FragmentManager fragmentManger = getSupportFragmentManager();
-                fragmentManger.beginTransaction().replace(R.id.gager, parseUserContactsFrag).commit();
+//                Fragment parseUserContactsFrag = new ParseUserContactsFragment();
+//                Fragment aboutFrag = new AboutFragment();
+//                android.support.v4.app.FragmentManager fragmentManger = getSupportFragmentManager();
+//                fragmentManger.beginTransaction().replace(R.id.gager, parseUserContactsFrag).commit();
+
+                Intent i = new Intent(MainActivity.this, SelectContactsActivity.class);
+                startActivityForResult(i, PICK_PARSE_CONTACT);
 
                 //Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
                 //startActivityForResult(i, PICK_CONTACT);
@@ -105,16 +110,18 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PICK_CONTACT && resultCode == RESULT_OK) {
-            Uri contactUri = data.getData();
-            Cursor cursor = getContentResolver().query(contactUri, null, null, null, null);
-            cursor.moveToFirst();
-            String phone_number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-
-            activeContacts.add(new PhoneContact(name, phone_number));
-            Snackbar.make(findViewById(R.id.coordinatorLayout), "" + name + ", " + phone_number, Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+        if (requestCode == PICK_PARSE_CONTACT && resultCode == RESULT_OK) {
+//            Uri contactUri = data.getData();
+            activeContacts = (ArrayList<PhoneContact>) data.getSerializableExtra("selections");
+            Toast.makeText(this, activeContacts.size() + "", Toast.LENGTH_LONG).show();
+//            Cursor cursor = getContentResolver().query(contactUri, null, null, null, null);
+//            cursor.moveToFirst();
+//            String phone_number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+//            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+//
+//            activeContacts.add(new PhoneContact(name, phone_number));
+//            Snackbar.make(findViewById(R.id.coordinatorLayout), "success", Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show();
         }
     }
 
