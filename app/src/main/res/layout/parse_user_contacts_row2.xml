@@ -1,0 +1,35 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <TextView
+        android:id="@+id/parseUserContactsNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textSize="20sp"
+        android:layout_toEndOf="@+id/parseUserContactsCheckBox"
+        android:layout_alignTop="@+id/parseUserContactsCheckBox"
+        android:layout_toRightOf="@+id/parseUserContactsCheckBox" />
+
+    <TextView
+        android:id="@+id/parseUserContactsNumberTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Number"
+        android:textSize="20sp"
+        android:layout_below="@+id/parseUserContactsNameTextView"
+        android:layout_alignLeft="@+id/parseUserContactsNameTextView"
+        android:layout_alignStart="@+id/parseUserContactsNameTextView" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/deleteImageButton"
+        android:src="@drawable/delete_accent"
+        android:background="@android:color/transparent"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

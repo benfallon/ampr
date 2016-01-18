@@ -32,6 +32,8 @@ public class AmprApplication extends Application {
         Parse.initialize(this);
         Parse.setLogLevel(Parse.LOG_LEVEL_DEBUG);
 
+
+
     }
 
 }

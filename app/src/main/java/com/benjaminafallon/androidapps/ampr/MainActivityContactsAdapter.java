@@ -1,22 +1,28 @@
 package com.benjaminafallon.androidapps.ampr;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 
-public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
+public class MainActivityContactsAdapter extends ArrayAdapter<PhoneContact> {
 
     private ArrayList<Boolean> itemChecked = new ArrayList<Boolean>();
     public static ArrayList<PhoneContact> selectedContacts = new ArrayList<PhoneContact>();
+    private ParseUser currUser = ParseUser.getCurrentUser();
 
-    public ParseUserContactsAdapter(Context context, ArrayList<PhoneContact> contactsArrayList) {
+    public MainActivityContactsAdapter(Context context, ArrayList<PhoneContact> contactsArrayList) {
         //super(context, android.R.layout.simple_list_item_1, nutrientsArrayList);
         super(context, 0, contactsArrayList);
 
@@ -37,35 +43,36 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.parse_user_contacts_row, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.parse_user_contacts_row2, parent, false);
         }
 
-        final CheckBox cBox = (CheckBox) convertView.findViewById(R.id.checkBox); // your
-        // CheckBox
-        cBox.setOnClickListener(new View.OnClickListener() {
+        final ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteImageButton); // your
+        deleteButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
 
-                CheckBox cb = (CheckBox) v.findViewById(R.id.checkBox);
+                //ArrayList<PhoneContact> fromParse = new ArrayList<PhoneContact>();
+                //fromParse = (ArrayList<PhoneContact>) currUser.get("active");
 
-                //check and add contact to selectedContacts
-                if (cb.isChecked()) {
-                    itemChecked.set(position, true);
-                    selectedContacts.add(contact);
-                    Log.i("ADDING", "" + contact.getContactName());
+                //Log.i("size before delete: " + MainActivity.activeContacts.size(), "" + fromParse.size());
 
-                    //uncheck and remove contact from selectedContacts
-                } else if (!cb.isChecked()) {
-                    itemChecked.set(position, false);
-                    // do some operations here
-                    selectedContacts.remove(contact);
-                    Log.i("REMOVING", "" + contact.getContactNumber());
+                //currUser.removeAll("active", MainActivity.activeContacts);
+                //Log.i("size before delete: " + MainActivity.activeContacts.size(), "" + fromParse.size());
 
-                }
+                MainActivity.activeContacts.remove(position);
+                notifyDataSetChanged();
+
+                //currUser.addAllUnique("active", MainActivity.activeContacts);
+                //notifyDataSetChanged();
+
+                //fromParse = (ArrayList<PhoneContact>) currUser.get("active");
+                //Log.i("size after delete: (local) " + MainActivity.activeContacts.size(), "(Parse) " + fromParse.size());
+
+
             }
         });
 
-        cBox.setChecked(itemChecked.get(position));
+        //cBox.setChecked(itemChecked.get(position));
 
         // Lookup view for data population
         TextView contactName = (TextView) convertView.findViewById(R.id.parseUserContactsNameTextView);

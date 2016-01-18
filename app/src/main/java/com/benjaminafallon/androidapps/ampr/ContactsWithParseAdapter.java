@@ -9,14 +9,16 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 
-public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
+public class ContactsWithParseAdapter extends ArrayAdapter<ParseUser> {
 
     private ArrayList<Boolean> itemChecked = new ArrayList<Boolean>();
-    public static ArrayList<PhoneContact> selectedContacts = new ArrayList<PhoneContact>();
+    public static ArrayList<ParseUser> selectedContacts = new ArrayList<ParseUser>();
 
-    public ParseUserContactsAdapter(Context context, ArrayList<PhoneContact> contactsArrayList) {
+    public ContactsWithParseAdapter(Context context, ArrayList<ParseUser> contactsArrayList) {
         //super(context, android.R.layout.simple_list_item_1, nutrientsArrayList);
         super(context, 0, contactsArrayList);
 
@@ -33,7 +35,8 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         // Get the data item for this position
-        final PhoneContact contact = getItem(position);
+        //final PhoneContact contact = getItem(position);
+        final ParseUser contact = getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
@@ -52,14 +55,14 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
                 if (cb.isChecked()) {
                     itemChecked.set(position, true);
                     selectedContacts.add(contact);
-                    Log.i("ADDING", "" + contact.getContactName());
+                    //Log.i("ADDING", "" + contact.getContactName());
 
                     //uncheck and remove contact from selectedContacts
                 } else if (!cb.isChecked()) {
                     itemChecked.set(position, false);
                     // do some operations here
                     selectedContacts.remove(contact);
-                    Log.i("REMOVING", "" + contact.getContactNumber());
+                    //Log.i("REMOVING", "" + contact.getContactNumber());
 
                 }
             }
@@ -72,14 +75,14 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
         TextView contactNumber = (TextView) convertView.findViewById(R.id.parseUserContactsNumberTextView);
 
         // Populate the data into the template view using the data object
-        contactName.setText(contact.getContactName());
-        contactNumber.setText(contact.getContactNumber());
+        contactName.setText(contact.getString("name"));
+        contactNumber.setText(contact.getString("phone"));
 
         // Return the completed view to render on screen
         return convertView;
     }
 
-    public static ArrayList<PhoneContact> getCheckedItems() {
+    public static ArrayList<ParseUser> getCheckedItems() {
         return selectedContacts;
     }
 

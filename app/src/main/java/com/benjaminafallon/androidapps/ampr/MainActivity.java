@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.digits.sdk.android.AuthCallback;
@@ -45,58 +46,34 @@ public class MainActivity extends AppCompatActivity
     //public final int PICK_CONTACT = 2015;
     public final int PICK_PARSE_CONTACT = 2015;
 
-    private ArrayList<PhoneContact> activeContacts = new ArrayList<PhoneContact>();
+    public static ArrayList<PhoneContact> activeContacts = new ArrayList<PhoneContact>();
+    public static ArrayList<ParseUser> contactsWithParse = new ArrayList<ParseUser>();
+    ParseUser currUser;
+    public static List<ParseUser> parseContacts = new ArrayList<ParseUser>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       // ParseUser currUser = ParseUser.getCurrentUser();
+        currUser = ParseUser.getCurrentUser();
 
-        int i = 15;
-        while (i < 30) {
-            Log.i("i equals " + i, "log i");
-            ParseUser newUser = new ParseUser();
-            newUser.setEmail("example" + i + "@example.com");
-            newUser.setUsername("Bob" + i);
-            newUser.setPassword("strongpassword" + i);
-
-            newUser.signUpInBackground(new SignUpCallback() {
-                public void done(ParseException e) {
-                    if (e == null) {
-                        // Hooray! Let them use the app now.
-                    } else {
-                        // Sign up didn't succeed. Look at the ParseException
-                        // to figure out what went wrong
-                    }
-                }
-            });
-            i++;
-        }
-
-
+        //set-up Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //set-up FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-//                Fragment parseUserContactsFrag = new ParseUserContactsFragment();
-//                Fragment aboutFrag = new AboutFragment();
-//                android.support.v4.app.FragmentManager fragmentManger = getSupportFragmentManager();
-//                fragmentManger.beginTransaction().replace(R.id.gager, parseUserContactsFrag).commit();
-
                 Intent i = new Intent(MainActivity.this, SelectContactsActivity.class);
                 startActivityForResult(i, PICK_PARSE_CONTACT);
-
-                //Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-                //startActivityForResult(i, PICK_CONTACT);
             }
         });
 
+        //set-up Navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -111,17 +88,44 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_PARSE_CONTACT && resultCode == RESULT_OK) {
-//            Uri contactUri = data.getData();
             activeContacts = (ArrayList<PhoneContact>) data.getSerializableExtra("selections");
-            Toast.makeText(this, activeContacts.size() + "", Toast.LENGTH_LONG).show();
-//            Cursor cursor = getContentResolver().query(contactUri, null, null, null, null);
-//            cursor.moveToFirst();
-//            String phone_number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-//            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            //contactsWithParse = (ArrayList<ParseUser>) data.getSerializableExtra("selections");
+
+            //Toast.makeText(this, activeContacts.size() + "", Toast.LENGTH_LONG).show();
+            MainActivityContactsAdapter listviewAdapter = new MainActivityContactsAdapter(this, activeContacts);
+            //MainActivityParseContactsAdapter listviewAdapter = new MainActivityParseContactsAdapter(this, contactsWithParse);
+
+            ListView mainListView = (ListView) findViewById(R.id.parse_user_contacts_listview);
+            mainListView.setAdapter(listviewAdapter);
+
+//            ParseQuery<ParseUser> query = ParseUser.getQuery();
+//            //find ParseUsers whose phone numbers are in the user's Contacts List
+//            query.whereContainedIn("phone", numbers.keySet());
 //
-//            activeContacts.add(new PhoneContact(name, phone_number));
-//            Snackbar.make(findViewById(R.id.coordinatorLayout), "success", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show();
+//            List<ParseUser> users = query.find();
+
+            //ArrayList<ParseUser> selectedNumbers = new ArrayList<String>();
+            for (int i = 0; i < activeContacts.size(); i++) {
+                //change this so instead of adding to an array of number of I'm adding to an array of ParseUsers
+                //need to match phone numbers to ParseUsers
+                //currUser.addUnique("active", contactsWithParse.get(i));
+                currUser.addUnique("active", parseContacts.get(i));
+                //currUser.addUnique("active", activeContacts.get(i).getContactNumber());
+                currUser.saveInBackground();
+                //for each contact selected by the user, add their phone number to a new array that will be used to matc
+                //selectedNumbers.add(activeContacts.get(i).getContactNumber());
+                //ParseQuery<ParseUser> query = ParseUser.getQuery();
+                //find ParseUsers whose phone numbers are in the user's selected contacts
+                //query.whereContainedIn("phone", numbers.keySet());
+            }
+            //currUser.addAllUnique("active", activeContacts);
+            //currUser.saveInBackground();
+            //Log.i("activeContacts.size(): " + activeContacts.size(), "test");
+            //Log.i("userName: " + currUser.get("name"), "phone: " + currUser.get("phone"));
+
+            ArrayList<String> actives = (ArrayList<String>) currUser.get("active");
+            Log.i("actives.size(): " + actives.size(), "number[0] " + actives.get(0));
+
         }
     }
 
