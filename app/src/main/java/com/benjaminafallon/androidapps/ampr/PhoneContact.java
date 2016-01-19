@@ -13,10 +13,12 @@ public class PhoneContact implements Parcelable {
 
     private String contactName;
     private String contactNumber;
+    private String objectId;
 
-    public PhoneContact(String contactName, String contactNumber) {
+    public PhoneContact(String contactName, String contactNumber, String objectId) {
         this.contactName = contactName;
         this.contactNumber = contactNumber;
+        this.objectId = objectId;
     }
 
     public PhoneContact(Parcel source) {
@@ -40,13 +42,13 @@ public class PhoneContact implements Parcelable {
         this.contactNumber = contactNumber;
     }
 
-    //returns ParseUser if found; else, return null
-//    public ParseUser getParseContact() {
-//
-//        ParseQuery<ParseUser> query = ParseUser.getQuery();
-//
-//
-//    }
+    public String getContactObjectId() {
+        return objectId;
+    }
+
+    public void setContactObjectId(String objectId) {
+        this.objectId = objectId;
+    }
 
     @Override
     public int describeContents() {
@@ -57,11 +59,13 @@ public class PhoneContact implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(contactName);
         parcel.writeString(contactNumber);
+        parcel.writeString(objectId);
     }
 
     private void readFromParcel(Parcel in) {
         this.contactName = in.readString();
         this.contactNumber = in.readString();
+        this.objectId = in.readString();
     }
 
     public static final Parcelable.Creator<PhoneContact> CREATOR = new Parcelable.Creator<PhoneContact>() {

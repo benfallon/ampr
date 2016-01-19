@@ -30,10 +30,12 @@ public class SelectContactsActivity extends AppCompatActivity {
     String[] contactedUserNumbers;
     HashMap<String, String> contactsMap = new HashMap<>();
     ArrayList<PhoneContact> contactSelections = new ArrayList<PhoneContact>();
+    //ArrayList<String> contactSelectionsByObjectId = new ArrayList<String>();
+
     //ArrayList<ParseUser> contactParseSelections = new ArrayList<ParseUser>();
 
     //List<ParseUser> contactsWithParse = new ArrayList<ParseUser>();
-
+    //ArrayList<String> parseContactsByObjectId = new ArrayList<String>();
 
 
     @Override
@@ -49,9 +51,10 @@ public class SelectContactsActivity extends AppCompatActivity {
                 Intent returnIntent = new Intent();
                 //Stores phone numbers of selected contacts, to be returned to MainActivity.java
                 contactSelections = adapter.getCheckedItems();
+                //MainActivity.parseContacts = contactSelections;
                 //contactParseSelections = adapter.getCheckedItems();
+                //returnIntent.putExtra("selections", parseContactsByObjectId);
                 returnIntent.putExtra("selections", contactSelections);
-                //returnIntent.putExtra("selections", contactParseSelections);
                 setResult(RESULT_OK,returnIntent);
                 finish();
             }
@@ -98,9 +101,10 @@ public class SelectContactsActivity extends AppCompatActivity {
             return null;
         }
 
+        //retrieve the user's contacts from their phone
         public void retrieveContactList() {
 
-            parseUserContactsList.add(new PhoneContact("Tomz", "1029384756"));
+            parseUserContactsList.add(new PhoneContact("Tomz", "1029384756", "sample"));
             Cursor phones = null;
 
             try {
@@ -128,13 +132,15 @@ public class SelectContactsActivity extends AppCompatActivity {
             }
         }
 
+        //from the user's contacts, find those with a user account on Parse based on their phone number
         public void retrieveContactedUsers(Map<String, String> numbers) throws ParseException {
             ParseQuery<ParseUser> query = ParseUser.getQuery();
             //find ParseUsers whose phone numbers are in the user's Contacts List
             query.whereContainedIn("phone", numbers.keySet());
 
             List<ParseUser> users = query.find();
-            MainActivity.parseContacts = users;
+            //save list of contacts with parse to parseContacts static variable in MainActivity
+            MainActivity.allParseContacts = users;
             //contactsWithParse = (ArrayList<ParseUser>) query.find();
             //MainActivity.activeContacts = users;
 
@@ -149,8 +155,10 @@ public class SelectContactsActivity extends AppCompatActivity {
             for (int i = 0; i < users.size(); i++) {
                 String name = (String) users.get(i).get("name");
                 String phone_number = (String) users.get(i).get("phone");
+                String object_id = (String) users.get(i).getObjectId();
                 contactedUserNumbers[i] = phone_number;
-                parseUserContactsList.add(new PhoneContact(name, phone_number));
+                parseUserContactsList.add(new PhoneContact(name, phone_number, object_id));
+                //parseContactsByObjectId.add(object_id);
             }
         }
     }

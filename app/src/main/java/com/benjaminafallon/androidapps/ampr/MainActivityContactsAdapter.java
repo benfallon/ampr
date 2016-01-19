@@ -59,6 +59,8 @@ public class MainActivityContactsAdapter extends ArrayAdapter<PhoneContact> {
                 //currUser.removeAll("active", MainActivity.activeContacts);
                 //Log.i("size before delete: " + MainActivity.activeContacts.size(), "" + fromParse.size());
 
+                //remove all instances in Collection in second param from the array associated with the first param's key
+                //currUser.removeAll("active", MainActivity.parseContacts);
                 MainActivity.activeContacts.remove(position);
                 notifyDataSetChanged();
 

@@ -52,14 +52,14 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
                 if (cb.isChecked()) {
                     itemChecked.set(position, true);
                     selectedContacts.add(contact);
-                    Log.i("ADDING", "" + contact.getContactName());
+                    //Log.i("ADDING", "" + contact.getContactNumber());
 
                     //uncheck and remove contact from selectedContacts
                 } else if (!cb.isChecked()) {
                     itemChecked.set(position, false);
                     // do some operations here
                     selectedContacts.remove(contact);
-                    Log.i("REMOVING", "" + contact.getContactNumber());
+                    //Log.i("REMOVING", "" + contact.getContactNumber());
 
                 }
             }

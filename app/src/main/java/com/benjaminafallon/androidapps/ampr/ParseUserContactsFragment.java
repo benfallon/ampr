@@ -88,7 +88,7 @@ public class ParseUserContactsFragment extends Fragment {
 
         public void retrieveContactList() {
 
-            parseUserContactsList.add(new PhoneContact("Tomz", "1029384756"));
+            parseUserContactsList.add(new PhoneContact("Tomz", "1029384756", "sample"));
 
             ParseQuery<ParseObject> query = ParseQuery.getQuery("TestObject");
             query.whereEqualTo("foo", "bar");
@@ -147,7 +147,7 @@ public class ParseUserContactsFragment extends Fragment {
                 Log.i("name: " + value, "phone: " + phone_number);
                 contactedUserNumbers[i] = value;
                 //contactedUserNumbers[i] = phone_number;
-                parseUserContactsList.add(new PhoneContact(value, phone_number));
+                parseUserContactsList.add(new PhoneContact(value, phone_number, "sample"));
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.benjaminafallon.androidapps.ampr;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -27,6 +29,7 @@ import com.digits.sdk.android.Digits;
 import com.digits.sdk.android.DigitsAuthButton;
 import com.digits.sdk.android.DigitsException;
 import com.digits.sdk.android.DigitsSession;
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -39,6 +42,7 @@ import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     public static ArrayList<PhoneContact> activeContacts = new ArrayList<PhoneContact>();
     public static ArrayList<ParseUser> contactsWithParse = new ArrayList<ParseUser>();
     ParseUser currUser;
-    public static List<ParseUser> parseContacts = new ArrayList<ParseUser>();
+    public static List<ParseUser> allParseContacts = new ArrayList<ParseUser>();
 
 
     @Override
@@ -90,41 +94,102 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == PICK_PARSE_CONTACT && resultCode == RESULT_OK) {
             activeContacts = (ArrayList<PhoneContact>) data.getSerializableExtra("selections");
             //contactsWithParse = (ArrayList<ParseUser>) data.getSerializableExtra("selections");
-
-            //Toast.makeText(this, activeContacts.size() + "", Toast.LENGTH_LONG).show();
             MainActivityContactsAdapter listviewAdapter = new MainActivityContactsAdapter(this, activeContacts);
             //MainActivityParseContactsAdapter listviewAdapter = new MainActivityParseContactsAdapter(this, contactsWithParse);
+
+
+            ArrayList<String> activeObjectIds = new ArrayList<String>();
+            for (int i = 0; i < activeContacts.size(); i++) {
+                //Log.i("objectId[i]: ", " " + activeContacts.get(i).getContactObjectId());
+                activeObjectIds.add(activeContacts.get(i).getContactObjectId());
+                currUser.addUnique("active", activeContacts.get(i).getContactObjectId());
+                currUser.saveInBackground();
+
+            }
+
+            //find ParseUsers that the current user has selected; i.e. the "active" ParseUsers for that user
+            ParseQuery<ParseUser> query = ParseUser.getQuery();
+            query.whereContainedIn("objectId", activeObjectIds);
+            List<ParseUser> selectedUsers = new ArrayList<ParseUser>();
+            try {
+                selectedUsers = query.find();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            //Log.i("selectedParseUsers found:", " " + selectedUsers.size());
+
+
+            Log.i("currUserObjectId: ", " " + currUser.getObjectId());
+            for (int i = 0; i < selectedUsers.size(); i++) {
+                ParseUser p = selectedUsers.get(i);
+                Log.i("otherUser[" + i + "] ObjectId: ", " " + p.getObjectId());
+
+                List<String> otherUserActiveObjectIds = (ArrayList<String>) p.get("active");
+                Log.i("active list size:", " " + otherUserActiveObjectIds.size());
+
+                for (String otherUserActiveSelection: otherUserActiveObjectIds) {
+                    Log.i("otherUserChoice: ", " " + otherUserActiveSelection);
+                    if (otherUserActiveSelection.equals(currUser.getObjectId())) {
+                        Log.i("MATCH!", "MATCH! MATCH! MATCH!");
+
+                        showMatchDialog(p.getString("name"));
+
+                    }
+//                    else {
+//                        Log.i("no match", "no match no match no match");
+//                    }
+                }
+
+            }
+
+
+
+
 
             ListView mainListView = (ListView) findViewById(R.id.parse_user_contacts_listview);
             mainListView.setAdapter(listviewAdapter);
 
-//            ParseQuery<ParseUser> query = ParseUser.getQuery();
-//            //find ParseUsers whose phone numbers are in the user's Contacts List
-//            query.whereContainedIn("phone", numbers.keySet());
-//
-//            List<ParseUser> users = query.find();
-
             //ArrayList<ParseUser> selectedNumbers = new ArrayList<String>();
-            for (int i = 0; i < activeContacts.size(); i++) {
-                //change this so instead of adding to an array of number of I'm adding to an array of ParseUsers
-                //need to match phone numbers to ParseUsers
-                //currUser.addUnique("active", contactsWithParse.get(i));
-                currUser.addUnique("active", parseContacts.get(i));
-                //currUser.addUnique("active", activeContacts.get(i).getContactNumber());
-                currUser.saveInBackground();
-                //for each contact selected by the user, add their phone number to a new array that will be used to matc
-                //selectedNumbers.add(activeContacts.get(i).getContactNumber());
-                //ParseQuery<ParseUser> query = ParseUser.getQuery();
-                //find ParseUsers whose phone numbers are in the user's selected contacts
-                //query.whereContainedIn("phone", numbers.keySet());
-            }
+            //ParseQuery<ParseUser> query = ParseUser.getQuery();
+            //find ParseUsers whose phone numbers are in the user's Contacts List
+
+            //query.whereContainedIn("objectId", activeContacts);
+
+//            HashMap<String, String> activeContactsMap = new HashMap<String, String>();
+//            for (int i = 0; i < activeContacts.size(); i++) {
+//                activeContactsMap.put(activeContacts.get(i).getContactName());
+//            }
+
+
+//            for (int i = 0; i < allParseContacts.size(); i++) {
+//                currUser.addUnique("active", allParseContacts.get(i).getObjectId());
+//                currUser.saveInBackground();
+
+
+//                query.whereEqualTo("objectId",parseContacts.get(i).getObjectId());
+//                query.findInBackground(new FindCallback<ParseUser>() {
+//                    public void done(List<ParseUser> objects, ParseException e) {
+//                        if (e == null) {
+//                            // The query was successful.
+//                        } else {
+//                            // Something went wrong.
+//                        }
+//                    }
+//                });
+
+
+//            }
+
+            //check to see if any of the user's contacts in 'active' also have the user in their own 'active' array
+
+
             //currUser.addAllUnique("active", activeContacts);
             //currUser.saveInBackground();
             //Log.i("activeContacts.size(): " + activeContacts.size(), "test");
             //Log.i("userName: " + currUser.get("name"), "phone: " + currUser.get("phone"));
 
-            ArrayList<String> actives = (ArrayList<String>) currUser.get("active");
-            Log.i("actives.size(): " + actives.size(), "number[0] " + actives.get(0));
+            //ArrayList<String> actives = (ArrayList<String>) currUser.get("active");
+            //Log.i("actives.size(): " + actives.size(), "number[0] " + actives.get(0));
 
         }
     }
@@ -185,5 +250,31 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void showMatchDialog(String name) {
+        AlertDialog.Builder matchDialog = new AlertDialog.Builder(this);
+        matchDialog.setTitle("It's a Match!");
+        matchDialog.setMessage("You matched with " + name + "!");
+
+        // Setting Positive "Yes" Btn
+        matchDialog.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                }
+        );
+//
+        // Setting Negative "NO" Btn
+        matchDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        // Showing Alert Dialog
+        matchDialog.show();
     }
 }
