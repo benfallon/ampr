@@ -23,16 +23,12 @@ public class MainActivityContactsAdapter extends ArrayAdapter<PhoneContact> {
     private ParseUser currUser = ParseUser.getCurrentUser();
 
     public MainActivityContactsAdapter(Context context, ArrayList<PhoneContact> contactsArrayList) {
-        //super(context, android.R.layout.simple_list_item_1, nutrientsArrayList);
         super(context, 0, contactsArrayList);
 
         // initialize all items value with false
         for (int i = 0; i < this.getCount(); i++) {
             itemChecked.add(i, false);
         }
-
-        //selectedContacts.clear();
-
     }
 
     @Override
@@ -50,31 +46,10 @@ public class MainActivityContactsAdapter extends ArrayAdapter<PhoneContact> {
         deleteButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-
-                //ArrayList<PhoneContact> fromParse = new ArrayList<PhoneContact>();
-                //fromParse = (ArrayList<PhoneContact>) currUser.get("active");
-
-                //Log.i("size before delete: " + MainActivity.activeContacts.size(), "" + fromParse.size());
-
-                //currUser.removeAll("active", MainActivity.activeContacts);
-                //Log.i("size before delete: " + MainActivity.activeContacts.size(), "" + fromParse.size());
-
-                //remove all instances in Collection in second param from the array associated with the first param's key
-                //currUser.removeAll("active", MainActivity.parseContacts);
                 MainActivity.activeContacts.remove(position);
                 notifyDataSetChanged();
-
-                //currUser.addAllUnique("active", MainActivity.activeContacts);
-                //notifyDataSetChanged();
-
-                //fromParse = (ArrayList<PhoneContact>) currUser.get("active");
-                //Log.i("size after delete: (local) " + MainActivity.activeContacts.size(), "(Parse) " + fromParse.size());
-
-
             }
         });
-
-        //cBox.setChecked(itemChecked.get(position));
 
         // Lookup view for data population
         TextView contactName = (TextView) convertView.findViewById(R.id.parseUserContactsNameTextView);

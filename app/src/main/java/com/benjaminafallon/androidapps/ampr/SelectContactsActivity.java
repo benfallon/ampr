@@ -25,18 +25,10 @@ import java.util.Map;
 public class SelectContactsActivity extends AppCompatActivity {
 
     ParseUserContactsAdapter adapter;
-    //ContactsWithParseAdapter adapter;
     ParseUser user;
     String[] contactedUserNumbers;
     HashMap<String, String> contactsMap = new HashMap<>();
     ArrayList<PhoneContact> contactSelections = new ArrayList<PhoneContact>();
-    //ArrayList<String> contactSelectionsByObjectId = new ArrayList<String>();
-
-    //ArrayList<ParseUser> contactParseSelections = new ArrayList<ParseUser>();
-
-    //List<ParseUser> contactsWithParse = new ArrayList<ParseUser>();
-    //ArrayList<String> parseContactsByObjectId = new ArrayList<String>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +43,6 @@ public class SelectContactsActivity extends AppCompatActivity {
                 Intent returnIntent = new Intent();
                 //Stores phone numbers of selected contacts, to be returned to MainActivity.java
                 contactSelections = adapter.getCheckedItems();
-                //MainActivity.parseContacts = contactSelections;
-                //contactParseSelections = adapter.getCheckedItems();
-                //returnIntent.putExtra("selections", parseContactsByObjectId);
                 returnIntent.putExtra("selections", contactSelections);
                 setResult(RESULT_OK,returnIntent);
                 finish();
@@ -65,8 +54,6 @@ public class SelectContactsActivity extends AppCompatActivity {
     private class LoadParseUserContactsTask extends AsyncTask<Void, Void, Void> {
         private ProgressDialog dialog;
         ArrayList<PhoneContact> parseUserContactsList = new ArrayList<PhoneContact>();
-        ArrayList<ParseUser> contactsWithParse = new ArrayList<ParseUser>();
-        ArrayList<String> contactNumbersList = new ArrayList<String>();
 
         public LoadParseUserContactsTask() {
             dialog = new ProgressDialog(SelectContactsActivity.this);
@@ -88,9 +75,7 @@ public class SelectContactsActivity extends AppCompatActivity {
 
             //the following includes built-in layout XML files
             adapter = new ParseUserContactsAdapter(SelectContactsActivity.this, parseUserContactsList);
-            //adapter = new ContactsWithParseAdapter(SelectContactsActivity.this, contactsWithParse);
 
-            //Log.i("onPostExecute; ", "parseUserContactsList.size(): " + parseUserContactsList.size());
             parseUserContactsListView.setAdapter(adapter);
 
         }
@@ -141,15 +126,10 @@ public class SelectContactsActivity extends AppCompatActivity {
             List<ParseUser> users = query.find();
             //save list of contacts with parse to parseContacts static variable in MainActivity
             MainActivity.allParseContacts = users;
-            //contactsWithParse = (ArrayList<ParseUser>) query.find();
-            //MainActivity.activeContacts = users;
 
             contactedUserNumbers = new String[users.size()];
-            //contactedUserNumbers = new String[contactsWithParse.size()];
 
             Log.i("contacts with Parse: ", users.size() + " ");
-            //Log.i("contacts with Parse: ", contactsWithParse.size() + " ");
-
 
             //add Contacts with Parse to parseUserContactsList to display in the 'Choose Contacts' ListView
             for (int i = 0; i < users.size(); i++) {
@@ -158,7 +138,6 @@ public class SelectContactsActivity extends AppCompatActivity {
                 String object_id = (String) users.get(i).getObjectId();
                 contactedUserNumbers[i] = phone_number;
                 parseUserContactsList.add(new PhoneContact(name, phone_number, object_id));
-                //parseContactsByObjectId.add(object_id);
             }
         }
     }

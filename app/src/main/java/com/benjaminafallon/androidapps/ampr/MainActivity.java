@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity
     public final int PICK_PARSE_CONTACT = 2015;
 
     public static ArrayList<PhoneContact> activeContacts = new ArrayList<PhoneContact>();
-    public static ArrayList<ParseUser> contactsWithParse = new ArrayList<ParseUser>();
     ParseUser currUser;
     public static List<ParseUser> allParseContacts = new ArrayList<ParseUser>();
 
@@ -93,18 +92,13 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_PARSE_CONTACT && resultCode == RESULT_OK) {
             activeContacts = (ArrayList<PhoneContact>) data.getSerializableExtra("selections");
-            //contactsWithParse = (ArrayList<ParseUser>) data.getSerializableExtra("selections");
             MainActivityContactsAdapter listviewAdapter = new MainActivityContactsAdapter(this, activeContacts);
-            //MainActivityParseContactsAdapter listviewAdapter = new MainActivityParseContactsAdapter(this, contactsWithParse);
-
 
             ArrayList<String> activeObjectIds = new ArrayList<String>();
             for (int i = 0; i < activeContacts.size(); i++) {
-                //Log.i("objectId[i]: ", " " + activeContacts.get(i).getContactObjectId());
                 activeObjectIds.add(activeContacts.get(i).getContactObjectId());
                 currUser.addUnique("active", activeContacts.get(i).getContactObjectId());
                 currUser.saveInBackground();
-
             }
 
             //find ParseUsers that the current user has selected; i.e. the "active" ParseUsers for that user
@@ -116,8 +110,6 @@ public class MainActivity extends AppCompatActivity
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            //Log.i("selectedParseUsers found:", " " + selectedUsers.size());
-
 
             Log.i("currUserObjectId: ", " " + currUser.getObjectId());
             for (int i = 0; i < selectedUsers.size(); i++) {
@@ -135,62 +127,12 @@ public class MainActivity extends AppCompatActivity
                         showMatchDialog(p.getString("name"));
 
                     }
-//                    else {
-//                        Log.i("no match", "no match no match no match");
-//                    }
                 }
 
             }
 
-
-
-
-
             ListView mainListView = (ListView) findViewById(R.id.parse_user_contacts_listview);
             mainListView.setAdapter(listviewAdapter);
-
-            //ArrayList<ParseUser> selectedNumbers = new ArrayList<String>();
-            //ParseQuery<ParseUser> query = ParseUser.getQuery();
-            //find ParseUsers whose phone numbers are in the user's Contacts List
-
-            //query.whereContainedIn("objectId", activeContacts);
-
-//            HashMap<String, String> activeContactsMap = new HashMap<String, String>();
-//            for (int i = 0; i < activeContacts.size(); i++) {
-//                activeContactsMap.put(activeContacts.get(i).getContactName());
-//            }
-
-
-//            for (int i = 0; i < allParseContacts.size(); i++) {
-//                currUser.addUnique("active", allParseContacts.get(i).getObjectId());
-//                currUser.saveInBackground();
-
-
-//                query.whereEqualTo("objectId",parseContacts.get(i).getObjectId());
-//                query.findInBackground(new FindCallback<ParseUser>() {
-//                    public void done(List<ParseUser> objects, ParseException e) {
-//                        if (e == null) {
-//                            // The query was successful.
-//                        } else {
-//                            // Something went wrong.
-//                        }
-//                    }
-//                });
-
-
-//            }
-
-            //check to see if any of the user's contacts in 'active' also have the user in their own 'active' array
-
-
-            //currUser.addAllUnique("active", activeContacts);
-            //currUser.saveInBackground();
-            //Log.i("activeContacts.size(): " + activeContacts.size(), "test");
-            //Log.i("userName: " + currUser.get("name"), "phone: " + currUser.get("phone"));
-
-            //ArrayList<String> actives = (ArrayList<String>) currUser.get("active");
-            //Log.i("actives.size(): " + actives.size(), "number[0] " + actives.get(0));
-
         }
     }
 
@@ -244,7 +186,6 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_send) {
             ParseUser.logOut();
-            Log.i("logged out...", "logging out...");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

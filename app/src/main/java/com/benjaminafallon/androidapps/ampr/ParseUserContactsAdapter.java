@@ -17,16 +17,12 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
     public static ArrayList<PhoneContact> selectedContacts = new ArrayList<PhoneContact>();
 
     public ParseUserContactsAdapter(Context context, ArrayList<PhoneContact> contactsArrayList) {
-        //super(context, android.R.layout.simple_list_item_1, nutrientsArrayList);
         super(context, 0, contactsArrayList);
 
         // initialize all items value with false
         for (int i = 0; i < this.getCount(); i++) {
             itemChecked.add(i, false);
         }
-
-        //selectedContacts.clear();
-
     }
 
     @Override
@@ -52,15 +48,13 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
                 if (cb.isChecked()) {
                     itemChecked.set(position, true);
                     selectedContacts.add(contact);
-                    //Log.i("ADDING", "" + contact.getContactNumber());
-
-                    //uncheck and remove contact from selectedContacts
-                } else if (!cb.isChecked()) {
+                }
+                //uncheck and remove contact from selectedContacts
+                else if (!cb.isChecked()) {
                     itemChecked.set(position, false);
                     // do some operations here
                     selectedContacts.remove(contact);
                     //Log.i("REMOVING", "" + contact.getContactNumber());
-
                 }
             }
         });
