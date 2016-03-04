@@ -1,26 +1,26 @@
 package com.benjaminafallon.androidapps.ampr;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivityContactsAdapter extends ArrayAdapter<PhoneContact> {
 
     private ArrayList<Boolean> itemChecked = new ArrayList<Boolean>();
     public static ArrayList<PhoneContact> selectedContacts = new ArrayList<PhoneContact>();
     private ParseUser currUser = ParseUser.getCurrentUser();
+    ArrayList<String> deletedObjectId = new ArrayList<String>();
+
 
     public MainActivityContactsAdapter(Context context, ArrayList<PhoneContact> contactsArrayList) {
         super(context, 0, contactsArrayList);
@@ -43,11 +43,28 @@ public class MainActivityContactsAdapter extends ArrayAdapter<PhoneContact> {
         }
 
         final ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteImageButton); // your
+
         deleteButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-                MainActivity.activeContacts.remove(position);
+
+                String idToRemove = MainActivity.startingActives.get(position).getContactObjectId();
+                deletedObjectId.add(idToRemove);
+                Log.i("removing objectId: ", " " + idToRemove);
+                //remove active User from Parse database
+                //currUser.removeAll("active", deletedObjectId);
+                currUser.removeAll("active", Arrays.asList(idToRemove));
+                currUser.saveInBackground();
+
+
+                //remove active User from variable
+                MainActivity.startingActives.remove(position);
+                Log.i("startingActives size: ", MainActivity.startingActives.size() + ".");
                 notifyDataSetChanged();
+
+                //Log.i("active.size(): " + currUser.get("active"));
+
+
             }
         });
 

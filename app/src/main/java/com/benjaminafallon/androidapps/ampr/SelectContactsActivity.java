@@ -25,7 +25,6 @@ import java.util.Map;
 public class SelectContactsActivity extends AppCompatActivity {
 
     ParseUserContactsAdapter adapter;
-    ParseUser user;
     String[] contactedUserNumbers;
     HashMap<String, String> contactsMap = new HashMap<>();
     ArrayList<PhoneContact> contactSelections = new ArrayList<PhoneContact>();
@@ -89,7 +88,7 @@ public class SelectContactsActivity extends AppCompatActivity {
         //retrieve the user's contacts from their phone
         public void retrieveContactList() {
 
-            parseUserContactsList.add(new PhoneContact("Tomz", "1029384756", "sample"));
+           // parseUserContactsList.add(new PhoneContact("Tomz", "1029384756", "sample"));
             Cursor phones = null;
 
             try {

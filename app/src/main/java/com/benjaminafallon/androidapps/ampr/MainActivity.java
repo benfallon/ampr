@@ -53,14 +53,59 @@ public class MainActivity extends AppCompatActivity
     public static ArrayList<PhoneContact> activeContacts = new ArrayList<PhoneContact>();
     ParseUser currUser;
     public static List<ParseUser> allParseContacts = new ArrayList<ParseUser>();
+    //public static List<String> activeObjectIds = new ArrayList<String>();
+    public static ArrayList<PhoneContact> startingActives = new ArrayList<PhoneContact>();
 
+
+    MainActivityContactsAdapter listviewAdapter;
+    ListView mainListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        startingActives.clear();
+        Log.i("onCreate:", "in onCreate");
         currUser = ParseUser.getCurrentUser();
+        Log.i("currUser ==", "" + currUser.getUsername() );
+
+        try {
+            currUser.fetch();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        ArrayList<String> activeObjectIds;
+        try {
+            activeObjectIds = (ArrayList<String>) (currUser.get("active"));
+            Log.i("activeObjectIds: ", activeObjectIds.size() + ".");
+            ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+            userQuery.whereContainedIn("objectId", activeObjectIds);
+            List<ParseUser> initUsers = null;
+            initUsers = userQuery.find();
+            for (ParseUser p: initUsers) {
+                startingActives.add(new PhoneContact(p.getString("name"), p.getString("phone"), p.getObjectId()));
+                Log.i("startingActives: ", " " + p.getObjectId());
+            }
+            Log.i("sA size(): ", " " + startingActives.size());
+        }
+        catch (NullPointerException e) {
+            System.err.println("Array 'active' is null, could not fetch data.");
+            e.printStackTrace();
+        }
+        catch (ParseException e) {
+            System.err.println("Could not fetch data from Parse.");
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            System.err.println("An unknown error occurred.");
+            e.printStackTrace();
+        }
+
+        listviewAdapter = new MainActivityContactsAdapter(this, startingActives);
+        mainListView = (ListView) findViewById(R.id.parse_user_contacts_listview);
+        mainListView.setAdapter(listviewAdapter);
 
         //set-up Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -92,16 +137,32 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_PARSE_CONTACT && resultCode == RESULT_OK) {
             activeContacts = (ArrayList<PhoneContact>) data.getSerializableExtra("selections");
-            MainActivityContactsAdapter listviewAdapter = new MainActivityContactsAdapter(this, activeContacts);
+//            for (PhoneContact newlySelected: activeContacts) {
+////                startingActives.add(newlySelected);
+////                Log.i("startingActives size: ", startingActives.size() + ".");
+//            }
+            //listviewAdapter.notifyDataSetChanged();
 
+            //mainListView.
+            //MainActivityContactsAdapter listviewAdapter = new MainActivityContactsAdapter(this, activeContacts);
+
+            //add selected users to active array in Parse database
             ArrayList<String> activeObjectIds = new ArrayList<String>();
+            String currentObjectId;
             for (int i = 0; i < activeContacts.size(); i++) {
-                activeObjectIds.add(activeContacts.get(i).getContactObjectId());
-                currUser.addUnique("active", activeContacts.get(i).getContactObjectId());
+                startingActives.add(activeContacts.get(i));
+                Log.i("startingActives size: ", startingActives.size() + ".");
+
+                currentObjectId = activeContacts.get(i).getContactObjectId();
+                activeObjectIds.add(currentObjectId);
+                currUser.addUnique("active", activeObjectIds);
                 currUser.saveInBackground();
             }
+            listviewAdapter.notifyDataSetChanged();
+
 
             //find ParseUsers that the current user has selected; i.e. the "active" ParseUsers for that user
+            //once found, these users will have their active arrays searched for the current user, signaling a match
             ParseQuery<ParseUser> query = ParseUser.getQuery();
             query.whereContainedIn("objectId", activeObjectIds);
             List<ParseUser> selectedUsers = new ArrayList<ParseUser>();
@@ -116,12 +177,15 @@ public class MainActivity extends AppCompatActivity
                 ParseUser p = selectedUsers.get(i);
                 Log.i("otherUser[" + i + "] ObjectId: ", " " + p.getObjectId());
 
-                List<String> otherUserActiveObjectIds = (ArrayList<String>) p.get("active");
-                Log.i("active list size:", " " + otherUserActiveObjectIds.size());
+                ArrayList<String> otherUserActiveObjectIds = (ArrayList<String>) p.get("active");
 
-                for (String otherUserActiveSelection: otherUserActiveObjectIds) {
-                    Log.i("otherUserChoice: ", " " + otherUserActiveSelection);
-                    if (otherUserActiveSelection.equals(currUser.getObjectId())) {
+                //Log.i("active list size:", " " + otherUserActiveObjectIds.size());
+
+                //for (String otherUserActiveSelection: otherUserActiveObjectIds) {
+
+                for (int j = 0; j < otherUserActiveObjectIds.size(); j++) {
+                    //Log.i("otherUserChoice: ", " " + otherUserActiveObjectIds.get(j).toString());
+                    if (otherUserActiveObjectIds.get(j).equals(currUser.getObjectId())) {
                         Log.i("MATCH!", "MATCH! MATCH! MATCH!");
 
                         showMatchDialog(p.getString("name"));
@@ -131,8 +195,8 @@ public class MainActivity extends AppCompatActivity
 
             }
 
-            ListView mainListView = (ListView) findViewById(R.id.parse_user_contacts_listview);
-            mainListView.setAdapter(listviewAdapter);
+//            ListView mainListView = (ListView) findViewById(R.id.parse_user_contacts_listview);
+//            mainListView.setAdapter(listviewAdapter);
         }
     }
 

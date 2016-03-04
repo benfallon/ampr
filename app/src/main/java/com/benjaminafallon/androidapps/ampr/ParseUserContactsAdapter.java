@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 
 public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
@@ -54,7 +56,6 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
                     itemChecked.set(position, false);
                     // do some operations here
                     selectedContacts.remove(contact);
-                    //Log.i("REMOVING", "" + contact.getContactNumber());
                 }
             }
         });

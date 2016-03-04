@@ -17,7 +17,6 @@ import com.twitter.sdk.android.core.TwitterCore;
 
 import io.fabric.sdk.android.Fabric;
 
-
 public class AmprApplication extends Application {
 
     private AuthCallback authCallback;
