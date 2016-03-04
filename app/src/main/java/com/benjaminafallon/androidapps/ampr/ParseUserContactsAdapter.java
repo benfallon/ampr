@@ -78,4 +78,9 @@ public class ParseUserContactsAdapter extends ArrayAdapter<PhoneContact> {
         return selectedContacts;
     }
 
+    public static void resetCheckedItems() {
+        selectedContacts.clear();
+    }
+
+
 }

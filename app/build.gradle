@@ -46,4 +46,5 @@ dependencies {
     compile 'com.parse:parse-android:1.11.0'
     compile project(':ParseUI-Login')
     compile project(':ParseUI-Widget')
+    compile 'com.googlecode.libphonenumber:libphonenumber:7.2.6'
 }

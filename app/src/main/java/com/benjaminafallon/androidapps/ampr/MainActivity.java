@@ -65,7 +65,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startingActives.clear();
+        //Need to clear array? New instance will be created every time a new instance of MainActivity is created
+        //startingActives.clear();
         Log.i("onCreate:", "in onCreate");
         currUser = ParseUser.getCurrentUser();
         Log.i("currUser ==", "" + currUser.getUsername() );
@@ -78,17 +79,23 @@ public class MainActivity extends AppCompatActivity
 
         ArrayList<String> activeObjectIds;
         try {
+            //1.) fetch objectIds from active property of User object in Parse
             activeObjectIds = (ArrayList<String>) (currUser.get("active"));
+
             Log.i("activeObjectIds: ", activeObjectIds.size() + ".");
+
+            //2.) get Users with those objectIds
             ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
             userQuery.whereContainedIn("objectId", activeObjectIds);
             List<ParseUser> initUsers = null;
             initUsers = userQuery.find();
+
+            //3.) for each User with an objectId in current User's actives array, create a Phone Contact object
+            //  This allows the user's information to be displayed in the listview
             for (ParseUser p: initUsers) {
                 startingActives.add(new PhoneContact(p.getString("name"), p.getString("phone"), p.getObjectId()));
                 Log.i("startingActives: ", " " + p.getObjectId());
             }
-            Log.i("sA size(): ", " " + startingActives.size());
         }
         catch (NullPointerException e) {
             System.err.println("Array 'active' is null, could not fetch data.");
@@ -103,6 +110,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        //Display listview of PhoneContacts in startingActives (derived from ParseUsers in initUsers)
         listviewAdapter = new MainActivityContactsAdapter(this, startingActives);
         mainListView = (ListView) findViewById(R.id.parse_user_contacts_listview);
         mainListView.setAdapter(listviewAdapter);
@@ -149,13 +157,27 @@ public class MainActivity extends AppCompatActivity
             //add selected users to active array in Parse database
             ArrayList<String> activeObjectIds = new ArrayList<String>();
             String currentObjectId;
-            for (int i = 0; i < activeContacts.size(); i++) {
-                startingActives.add(activeContacts.get(i));
-                Log.i("startingActives size: ", startingActives.size() + ".");
 
+            for (int i = 0; i < activeContacts.size(); i++) {
+                boolean alreadyPresent = false;
+                //for each newly-selected contact, only add to listview (startingActives) if not already present
+                for (int j = 0; j < startingActives.size(); j++) {
+
+                    Log.i("1: " + activeContacts.get(i).getContactObjectId(), "2: " + startingActives.get(j).getContactObjectId());
+
+                    //Only add selected contacts to the listview if they are not already in the listview
+                    if (activeContacts.get(i).getContactObjectId().equals(startingActives.get(j).getContactObjectId())) {
+                        alreadyPresent = true;
+                    }
+                }
+                if (!alreadyPresent) {
+                    startingActives.add(activeContacts.get(i));
+                }
+
+                //add newly-selected object ids to active array if not already in array
                 currentObjectId = activeContacts.get(i).getContactObjectId();
                 activeObjectIds.add(currentObjectId);
-                currUser.addUnique("active", activeObjectIds);
+                currUser.addAllUnique("active", activeObjectIds);
                 currUser.saveInBackground();
             }
             listviewAdapter.notifyDataSetChanged();
