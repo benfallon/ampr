@@ -114,6 +114,11 @@ public class SelectContactsActivity extends AppCompatActivity {
                     try {
                         Phonenumber.PhoneNumber usNumberProto = phoneUtil.parse(usNumberStr, "CH");
                         _number = Long.toString(usNumberProto.getNationalNumber());
+                        //take off leading '1' if present. Parse stores phone numbers without '1' on signup, so
+                        //this must be done to properly compare values
+                        if (_number.substring(0,1).equals("1")) {
+                            _number = _number.substring(1);
+                        }
 //                        Log.i("number: ", "" + _number);
 //                        Log.i("formatted number: ", "" + _number);
                     } catch (NumberParseException e) {
@@ -145,6 +150,10 @@ public class SelectContactsActivity extends AppCompatActivity {
             ParseQuery<ParseUser> query = ParseUser.getQuery();
             //find ParseUsers whose phone numbers are in the user's Contacts List
             query.whereContainedIn("phone", numbers.keySet());
+
+            for (String num: numbers.keySet()) {
+                Log.i("number: " + num, "name: " + numbers.get(num));
+            }
 
             List<ParseUser> users = query.find();
             //save list of contacts with parse to parseContacts static variable in MainActivity

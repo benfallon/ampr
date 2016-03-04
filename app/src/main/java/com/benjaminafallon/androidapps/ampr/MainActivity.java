@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity
     ParseUser currUser;
     public static List<ParseUser> allParseContacts = new ArrayList<ParseUser>();
     //public static List<String> activeObjectIds = new ArrayList<String>();
-    public static ArrayList<PhoneContact> startingActives = new ArrayList<PhoneContact>();
+    public static ArrayList<PhoneContact> startingActives;
 
 
     MainActivityContactsAdapter listviewAdapter;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        startingActives = new ArrayList<PhoneContact>();
         //Need to clear array? New instance will be created every time a new instance of MainActivity is created
         //startingActives.clear();
         Log.i("onCreate:", "in onCreate");
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity
 
         ArrayList<String> activeObjectIds;
         try {
-            //1.) fetch objectIds from active property of User object in Parse
+            //1.) fetch objectIds from active property on User object in Parse
             activeObjectIds = (ArrayList<String>) (currUser.get("active"));
 
             Log.i("activeObjectIds: ", activeObjectIds.size() + ".");
@@ -138,6 +138,19 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.i("onResume:", "in onResume");
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        Log.i("onStart:", "in onStart");
 
     }
 
@@ -260,18 +273,11 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        if (id == R.id.sign_out) {
             ParseUser.logOut();
+            Intent intent = new Intent(MainActivity.this,LoginDispatchActivity.class);
+            startActivity(intent);
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
