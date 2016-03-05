@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity
                     if (otherUserActiveObjectIds.get(j).equals(currUser.getObjectId())) {
                         Log.i("MATCH!", "MATCH! MATCH! MATCH!");
 
-                        showMatchDialog(p.getString("name"));
+                        showMatchDialog(p.getString("name"), p.getString("phone"));
 
                     }
                 }
@@ -285,16 +285,28 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void showMatchDialog(String name) {
+    public void showMatchDialog(String name, final String phone) {
         AlertDialog.Builder matchDialog = new AlertDialog.Builder(this);
         matchDialog.setTitle("It's a Match!");
-        matchDialog.setMessage("You matched with " + name + "!");
+        matchDialog.setMessage(name + " is free to Haang!");
 
         // Setting Positive "Yes" Btn
-        matchDialog.setPositiveButton("OK",
+//        matchDialog.setPositiveButton("OK",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.cancel();
+//                    }
+//                }
+//        );
+
+        // Setting Positive "Yes" Btn
+        matchDialog.setPositiveButton("Message",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
+                        //Intent sendIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", (String) theUser.get("phone"), null));
+                        //sendIntent.putExtra("sms_body", "sample message here");
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", phone, null)));
+                        Log.i("Sending Intent", "Sending");
                     }
                 }
         );
