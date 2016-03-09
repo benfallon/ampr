@@ -69,19 +69,11 @@ public class SelectContactsActivity extends AppCompatActivity {
 
     public void checkContactsPermissions() {
         //If permission not yet granted, request permission.
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
-            //Log.i("Permissions: ", "REQUIRED");
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    12);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, 12);
         }
         //If permission already granted; retrieve contacts.
         else {
-            //Log.i("Permissions: ", "APPROVED");
-
             new LoadParseUserContactsTask().execute();
         }
     }
@@ -94,24 +86,14 @@ public class SelectContactsActivity extends AppCompatActivity {
                 //PERMISSION was GRANTED
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                   // Log.i("Permissions: ", "GRANTED");
                     new LoadParseUserContactsTask().execute();
                 }
                 //PERMISSION was DENIED
                 else {
-
                     checkApiLevel();
-                       // Log.i("Permissions: ", "NEEDED");
-
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
@@ -122,7 +104,7 @@ public class SelectContactsActivity extends AppCompatActivity {
             if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
                 showPermissionsDialog();
             }
-            //user checked "Never ask again"
+            //user checked "Never ask again".
             else {
                 showResetPermissionsDialog();
             }
@@ -154,23 +136,17 @@ public class SelectContactsActivity extends AppCompatActivity {
             adapter = new ParseUserContactsAdapter(SelectContactsActivity.this, parseUserContactsList);
 
             parseUserContactsListView.setAdapter(adapter);
-
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            //Log.i("SELECTCONTACTSACTIVITY", "in doInBackground()");
             retrieveContactList();
             return null;
         }
 
         //retrieve the user's contacts from their phone
         public void retrieveContactList() {
-            //Log.i("SELECTCONTACTSACTIVITY", "in retrieveContactList()");
-
-           // parseUserContactsList.add(new PhoneContact("Tomz", "1029384756", "sample"));
             Cursor phones = null;
-
             try {
                 phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
                // Log.i("SELECTCONTACTSACTIVITY", "in getContentResolver()");
@@ -245,11 +221,11 @@ public class SelectContactsActivity extends AppCompatActivity {
         }
     }
 
+    //Show when app needs to access user's Contacts so that it can display "Contacts with Haang" ListView
     public void showPermissionsDialog() {
         AlertDialog.Builder matchDialog = new AlertDialog.Builder(this);
         matchDialog.setTitle("Contact Permission Required");
         matchDialog.setMessage("Haang requires access to your contacts in order to function properly. Your data will not be used outside of this functionality.");
-
 
         // Setting Positive "Yes" Btn
         matchDialog.setPositiveButton("Retry",
@@ -273,6 +249,7 @@ public class SelectContactsActivity extends AppCompatActivity {
         matchDialog.show();
     }
 
+    //Called when user tries to access Contacts but has denied permissions and also checked "Never ask again."
     public void showResetPermissionsDialog() {
         AlertDialog.Builder matchDialog = new AlertDialog.Builder(this);
         matchDialog.setTitle("Must Reset Permission");
@@ -287,15 +264,6 @@ public class SelectContactsActivity extends AppCompatActivity {
                     }
                 }
         );
-////
-//        // Setting Negative "NO" Btn
-//        matchDialog.setNegativeButton("Quit",
-//                new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.cancel();
-//                        finish();
-//                    }
-//                });
 
         // Showing Alert Dialog
         matchDialog.show();

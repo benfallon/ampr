@@ -60,6 +60,7 @@ public class MainActivityContactsAdapter extends ArrayAdapter<PhoneContact> {
                 //remove active User from variable
                 MainActivity.startingActives.remove(position);
                 Log.i("startingActives size: ", MainActivity.startingActives.size() + ".");
+                //MainActivity.globalActiveObjectIds.remove(position);
                 notifyDataSetChanged();
 
                 //Log.i("active.size(): " + currUser.get("active"));

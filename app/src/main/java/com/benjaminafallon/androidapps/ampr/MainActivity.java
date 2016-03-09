@@ -36,6 +36,12 @@ public class MainActivity extends AppCompatActivity
     ParseUser currUser;
     public static List<ParseUser> allParseContacts = new ArrayList<ParseUser>();
     public static ArrayList<PhoneContact> startingActives;
+    //ArrayList<String> activeObjectIds;
+    public static ArrayList<String> globalActiveObjectIds = new ArrayList<String>();
+
+    ArrayList<String> activeObjectIds = new ArrayList<String>();
+    String currentObjectId;
+
 
     MainActivityContactsAdapter listviewAdapter;
     ListView mainListView;
@@ -61,9 +67,42 @@ public class MainActivity extends AppCompatActivity
                 if (isChecked) {
                     //set boolean on Parse User to true; this will be used when checking if any friends you selected are also free
                     currUser.put("isFree", true);
+                    checkForMatch(startingActives);
                     // TO-DO: check all contacts for matches, so that if you open the app and
                     // toggle on your availability you can get notifications the same way you can
                     // when selecting contacts
+                    //find ParseUsers that the current user has selected; i.e. the "active" ParseUsers for that user
+                    //once found, these users will have their active arrays searched for the current user, signaling a match
+//                    ParseQuery<ParseUser> query = ParseUser.getQuery();
+//                    query.whereContainedIn("objectId", activeObjectIds);
+//                    List<ParseUser> selectedUsers = new ArrayList<ParseUser>();
+//                    try {
+//                        selectedUsers = query.find();
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    //selectedUsers includes all Parse Users whose objectId is in activeObjectIds, which reflects the current Contacts in the ListView
+//                    //For each of the Parse Users in the ListView, search their active array, which includes the Parse Users THEY (not you) have selected
+//                    for (int i = 0; i < selectedUsers.size(); i++) {
+//                        ParseUser p = selectedUsers.get(i);
+//
+//                        //get selectedUser's list of objectId Strings
+//                        ArrayList<String> otherUserActiveObjectIds = (ArrayList<String>) p.get("active");
+//
+//                        //for each objectId in the OTHER ParseUser's active array, check to see if it matches currUser's objectId
+//                        //in this case, we have a match (both users let each other know they are free)
+//                        //also check to make sure the OTHER ParseUser's isFree boolean is set to true (indicating they are free)
+//                        //if this boolean is not set to true, the currUser should not be alerted that the otherUser is free, even if they are both
+//                        //in each others' active array
+//                        for (int j = 0; j < otherUserActiveObjectIds.size(); j++) {
+//                            if (p.getBoolean("isFree")) {
+//                                if ( otherUserActiveObjectIds.get(j).equals(currUser.getObjectId()) ) {
+//                                    showMatchDialog(p.getString("name"), p.getString("phone"));
+//                                }
+//                            }
+//                        }
+//                    }
                 }
                 else {
                     currUser.put("isFree", false);
@@ -158,9 +197,11 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_PARSE_CONTACT && resultCode == RESULT_OK) {
             activeContacts = (ArrayList<PhoneContact>) data.getSerializableExtra("selections");
+            //updateViewAndData();
             //add selected users to active array in Parse database
-            ArrayList<String> activeObjectIds = new ArrayList<String>();
-            String currentObjectId;
+//            ArrayList<String> activeObjectIds = new ArrayList<String>();
+//            String currentObjectId;
+
 
             for (int i = 0; i < activeContacts.size(); i++) {
                 boolean alreadyPresent = false;
@@ -175,43 +216,103 @@ public class MainActivity extends AppCompatActivity
                     startingActives.add(activeContacts.get(i));
                 }
 
-                //add newly-selected object ids to active array if not already in array
+                //UPDATE PARSE: add newly-selected object ids to active array in Parse if not already in array
                 currentObjectId = activeContacts.get(i).getContactObjectId();
                 activeObjectIds.add(currentObjectId);
-                currUser.addAllUnique("active", activeObjectIds);
-                currUser.saveInBackground();
+//                currUser.addAllUnique("active", activeObjectIds);
+//                currUser.saveInBackground();
             }
+
+            currUser.addAllUnique("active", activeObjectIds);
+            currUser.saveInBackground();
+
             listviewAdapter.notifyDataSetChanged();
+//            checkForMatch(activeObjectIds);
 
-            //find ParseUsers that the current user has selected; i.e. the "active" ParseUsers for that user
-            //once found, these users will have their active arrays searched for the current user, signaling a match
-            ParseQuery<ParseUser> query = ParseUser.getQuery();
-            query.whereContainedIn("objectId", activeObjectIds);
-            List<ParseUser> selectedUsers = new ArrayList<ParseUser>();
-            try {
-                selectedUsers = query.find();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+//
+//            //find ParseUsers that the current user has selected; i.e. the "active" ParseUsers for that user
+//            //once found, these users will have their active arrays searched for the current user, signaling a match
+//            ParseQuery<ParseUser> query = ParseUser.getQuery();
+//            query.whereContainedIn("objectId", activeObjectIds);
+//            List<ParseUser> selectedUsers = new ArrayList<ParseUser>();
+//            try {
+//                selectedUsers = query.find();
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//
+//            //selectedUsers includes all Parse Users whose objectId is in activeObjectIds, which reflects the current Contacts in the ListView
+//            //For each of the Parse Users in the ListView, search their active array, which includes the Parse Users THEY (not you) have selected
+//            for (int i = 0; i < selectedUsers.size(); i++) {
+//                ParseUser p = selectedUsers.get(i);
+//
+//                //get selectedUser's list of objectId Strings
+//                ArrayList<String> otherUserActiveObjectIds = (ArrayList<String>) p.get("active");
+//
+//                //for each objectId in the OTHER ParseUser's active array, check to see if it matches currUser's objectId
+//                //in this case, we have a match (both users let each other know they are free)
+//                //also check to make sure the OTHER ParseUser's isFree boolean is set to true (indicating they are free)
+//                //if this boolean is not set to true, the currUser should not be alerted that the otherUser is free, even if they are both
+//                //in each others' active array
+//                for (int j = 0; j < otherUserActiveObjectIds.size(); j++) {
+//                    if (p.getBoolean("isFree")) {
+//                        if ( otherUserActiveObjectIds.get(j).equals(currUser.getObjectId()) ) {
+//                            showMatchDialog(p.getString("name"), p.getString("phone"));
+//                        }
+//                    }
+//                }
+//            }
+        }
+    }
 
-            //selectedUsers includes all Parse Users whose objectId is in activeObjectIds, which reflects the current Contacts in the ListView
-            //For each of the Parse Users in the ListView, search their active array, which includes the Parse Users THEY (not you) have selected
-            for (int i = 0; i < selectedUsers.size(); i++) {
-                ParseUser p = selectedUsers.get(i);
+    public void updateViewAndData() {
+        ArrayList<String> activeObjectIds = new ArrayList<String>();
+        String currentObjectId;
 
-                //get selectedUser's list of objectId Strings
-                ArrayList<String> otherUserActiveObjectIds = (ArrayList<String>) p.get("active");
+        for (int i = 0; i < activeContacts.size(); i++) {
 
-                //for each objectId in the OTHER ParseUser's active array, check to see if it matches currUser's objectId
-                //in this case, we have a match (both users let each other know they are free)
-                //also check to make sure the OTHER ParseUser's isFree boolean is set to true (indicating they are free)
-                //if this boolean is not set to true, the currUser should not be alerted that the otherUser is free, even if they are both
-                //in each others' active array
-                for (int j = 0; j < otherUserActiveObjectIds.size(); j++) {
-                    if (p.getBoolean("isFree")) {
-                        if ( otherUserActiveObjectIds.get(j).equals(currUser.getObjectId()) ) {
-                            showMatchDialog(p.getString("name"), p.getString("phone"));
-                        }
+        }
+    }
+
+    public void checkForMatch(ArrayList<PhoneContact> startingActivesArray) {
+
+        ArrayList<String> localActiveObjectIds = new ArrayList<String>();
+
+        for (PhoneContact pc: startingActivesArray) {
+            localActiveObjectIds.add(pc.getContactObjectId());
+        }
+
+
+        //find ParseUsers that the current user has selected; i.e. the "active" ParseUsers for that user
+        //once found, these users will have their active arrays searched for the current user, signaling a match
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        //query.whereContainedIn("objectId", activeObjectIds);
+        query.whereContainedIn("objectId", localActiveObjectIds);
+
+        List<ParseUser> selectedUsers = new ArrayList<ParseUser>();
+        try {
+            selectedUsers = query.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //selectedUsers includes all Parse Users whose objectId is in activeObjectIds, which reflects the current Contacts in the ListView
+        //For each of the Parse Users in the ListView, search their active array, which includes the Parse Users THEY (not you) have selected
+        for (int i = 0; i < selectedUsers.size(); i++) {
+            ParseUser p = selectedUsers.get(i);
+
+            //get selectedUser's list of objectId Strings
+            ArrayList<String> otherUserActiveObjectIds = (ArrayList<String>) p.get("active");
+
+            //for each objectId in the OTHER ParseUser's active array, check to see if it matches currUser's objectId
+            //in this case, we have a match (both users let each other know they are free)
+            //also check to make sure the OTHER ParseUser's isFree boolean is set to true (indicating they are free)
+            //if this boolean is not set to true, the currUser should not be alerted that the otherUser is free, even if they are both
+            //in each others' active array
+            for (int j = 0; j < otherUserActiveObjectIds.size(); j++) {
+                if (p.getBoolean("isFree")) {
+                    if ( otherUserActiveObjectIds.get(j).equals(currUser.getObjectId()) ) {
+                        showMatchDialog(p.getString("name"), p.getString("phone"));
                     }
                 }
             }
@@ -277,8 +378,6 @@ public class MainActivity extends AppCompatActivity
         matchDialog.setPositiveButton("Message",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        //Intent sendIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", (String) theUser.get("phone"), null));
-                        //sendIntent.putExtra("sms_body", "sample message here");
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", phone, null)));
                         //Log.i("Sending Intent", "Sending");
                     }
