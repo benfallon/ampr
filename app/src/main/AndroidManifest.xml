@@ -40,7 +40,7 @@
                 android:value="true"/>
             <meta-data
                 android:name="com.parse.ui.ParseLoginActivity.APP_LOGO"
-                android:resource="@drawable/dgts__logo"/>
+                android:resource="@drawable/haang_logo"/>
             <meta-data
                 android:name="com.parse.ui.ParseLoginActivity.FACEBOOK_LOGIN_ENABLED"
                 android:value="false"/>
